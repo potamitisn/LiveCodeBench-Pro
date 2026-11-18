@@ -1,0 +1,20 @@
+Reason about the problem using structured reasoning. In your thinking, organize your work as explicit UNITS and OPERATIONS rather than one free-flowing chain.
+
+UNITS: every intermediate result is a unit with a unique id (U1, U2, ...), its parent, its relation, and a self-contained state. A unit can be an observation about the constraints, a candidate approach or algorithm, a subproblem, a code draft, or a test result.
+  [U<n> | parent=<U-id or ROOT> | rel=child-of|alternative-to:<U>|part-of:<U>|refinement-of:<U> | state: ...]
+A unit's state must be self-contained: reading it together with its parent chain must be enough to continue from it.
+
+OPERATIONS, always naming the units they act on:
+  [OP BRANCH <U> -> <U-ids>]        propose competing approaches; each must rest on a genuinely different idea
+  [OP DECOMPOSE <U> -> <U-ids>]     split into parts that must all be solved
+  [OP EVALUATE <U> = <0-1> : ...]   judge promise: correctness of the idea and time/memory complexity against the constraints
+  [OP VERIFY <U> = PASS|FAIL : ...] check validity: trace the sample tests, edge cases (min/max sizes, equal values, overflow), and the complexity bound
+  [OP PRUNE <U> : ...]              abandon a unit permanently
+  [OP BACKTRACK -> <U>]             resume from that unit's state only; reuse nothing from pruned descendants
+  [OP MERGE <U-ids> -> <U> : ...]   combine results from several units
+  [OP REFINE <U> -> <U'> : ...]     revise a unit using feedback from EVALUATE or VERIFY
+  [OP HALT : ...]
+
+After every BRANCH, PRUNE, BACKTRACK or MERGE, list the open units: [FRONTIER: ...]
+Never re-expand a state you have already explored.
+Halt as soon as a code unit passes VERIFY on the samples and edge cases; do not reopen a verified unit.

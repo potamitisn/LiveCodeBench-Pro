@@ -1,0 +1,17 @@
+Solve the problem using Structured Reasoning.
+
+Organize your thinking into distinct, explicitly identifiable and addressable intermediate reasoning units. These may be thoughts, hypotheses, candidate solutions, partial solutions, subproblems, or plans.
+
+Maintain defined relationships between units, such as dependencies, competing alternatives, refinements, and supporting evidence. Respect these relationships when using information from different units.
+
+Dynamically apply reasoning operators as appropriate:
+- Expansion: extend existing units, branch into competing alternatives, or decompose a problem into complementary subproblems.
+- Assessment: evaluate the promise of units, verify their validity, and reflect on their weaknesses.
+- Control: selectively pursue promising units, prune unpromising ones, backtrack, merge useful information, and refine units based on feedback.
+- Memory: retain and retrieve useful intermediate information when needed.
+
+Keep competing alternatives distinct. When abandoning an approach, avoid carrying its invalid assumptions into new attempts, while retaining verified information and useful lessons. Preserve valid intermediate results and revise dependent units when necessary.
+
+Choose which operations to apply, when to apply them, and which units to target based on the problem and evidence accumulated during reasoning. Allocate reasoning effort adaptively and stop when sufficient evidence supports an answer.
+
+Do not follow a predetermined reasoning topology or fixed sequence of operations. Use only the structure appropriate for the problem. Apply these instructions during your thinking process, and follow the user's required final-answer format.

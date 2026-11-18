@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Tuple
 from openai import OpenAI
+import anthropic
+import time
 
 
 class LLMInterface(ABC):
@@ -77,6 +79,58 @@ class ExampleLLM(LLMInterface):
             messages=[{"role": "user", "content": user_prompt}],
         )
         return completion.choices[0].message.content, str(completion)
+
+
+class ClaudeSonnet45(LLMInterface):
+    """
+    Claude Sonnet 4.5 with extended thinking at its maximum budget.
+
+    Sonnet 4.5 caps output at 64K tokens, so the thinking budget is set just below that.
+    Streaming is used because requests this long would otherwise hit HTTP timeouts.
+    """
+
+    MODEL = "claude-sonnet-4-5-20250929"
+    MAX_TOKENS = 64000
+    THINKING_BUDGET = 63999
+
+    def __init__(self, system_prompt: str | None = None):
+        """
+        Args:
+            system_prompt: optional system prompt (e.g. structured-reasoning instructions).
+                None sends no system prompt, which is the original benchmark behavior.
+        """
+        super().__init__()
+        self.client = anthropic.Anthropic(max_retries=5)
+        self.system_prompt = system_prompt
+
+    def request_kwargs(self, user_prompt: str) -> dict:
+        kwargs = dict(
+            model=self.MODEL,
+            max_tokens=self.MAX_TOKENS,
+            thinking={"type": "enabled", "budget_tokens": self.THINKING_BUDGET},
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+        if self.system_prompt:
+            kwargs["system"] = self.system_prompt
+        return kwargs
+
+    def call_llm(self, user_prompt: str) -> Tuple[str, Any]:
+        start = time.monotonic()
+        with self.client.messages.stream(**self.request_kwargs(user_prompt)) as stream:
+            message = stream.get_final_message()
+        latency = time.monotonic() - start
+        # Only text blocks go to code extraction; thinking summaries are logged separately.
+        text = "".join(b.text for b in message.content if b.type == "text")
+        thinking = "\n\n".join(b.thinking for b in message.content if b.type == "thinking")
+        meta = {
+            "id": message.id,
+            "model": message.model,
+            "stop_reason": message.stop_reason,
+            "usage": message.usage.model_dump(),
+            "latency_s": round(latency, 1),
+            "thinking_summary": thinking,
+        }
+        return text, meta
 
 
 if __name__ == "__main__":

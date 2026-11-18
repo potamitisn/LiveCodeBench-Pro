@@ -168,6 +168,10 @@ class LightCPVerifierJudge(Judge):
         if result["status"] == "queued":
             return "Judging"
         if result["status"] == "error":
+            # A solution that does not compile is the model's failure, not the judge's.
+            if str(result.get("error", "")).startswith("Error: compile failed"):
+                return "Compile Error"
+            logger.warning(f"Judge error for submission {submission_id}: {result.get('error')}")
             return "Judge Failed"
         return result["result"]
 

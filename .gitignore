@@ -1,2 +1,5 @@
 __pycache__
 benchmark_result.json
+llm_responses.jsonl
+results/
+.env
